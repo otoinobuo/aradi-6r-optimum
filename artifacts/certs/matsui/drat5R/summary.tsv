@@ -1,0 +1,4 @@
+start=1	kissat=UNSATISFIABLE	solve_s=31.1	drat_trim=s VERIFIED	check_s=17.6	proof_bytes=41528702
+start=0	kissat=UNSATISFIABLE	solve_s=33.5	drat_trim=s VERIFIED	check_s=18.8	proof_bytes=43408682
+start=2	kissat=UNSATISFIABLE	solve_s=34.1	drat_trim=s VERIFIED	check_s=18.4	proof_bytes=44687959
+start=3	kissat=UNSATISFIABLE	solve_s=33.4	drat_trim=s VERIFIED	check_s=19.4	proof_bytes=44249389

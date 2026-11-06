@@ -1,0 +1,17 @@
+claasp_1R_k1_s0	kissat=UNSATISFIABLE	solve_s=0.0	drat_trim=s VERIFIED	check_s=0.0
+our_1R_k1_s1	kissat=UNSATISFIABLE	solve_s=0.0	drat_trim=s VERIFIED	check_s=0.0
+our_1R_k1_s2	kissat=UNSATISFIABLE	solve_s=0.0	drat_trim=s VERIFIED	check_s=0.1
+our_1R_k1_s3	kissat=UNSATISFIABLE	solve_s=0.0	drat_trim=s VERIFIED	check_s=0.1
+claasp_2R_k7_s0	kissat=UNSATISFIABLE	solve_s=0.1	drat_trim=s VERIFIED	check_s=0.1
+our_2R_k7_s1	kissat=UNSATISFIABLE	solve_s=0.2	drat_trim=s VERIFIED	check_s=0.1
+our_2R_k7_s2	kissat=UNSATISFIABLE	solve_s=0.2	drat_trim=s VERIFIED	check_s=0.1
+our_2R_k7_s3	kissat=UNSATISFIABLE	solve_s=0.2	drat_trim=s VERIFIED	check_s=0.1
+claasp_3R_k13_s0	kissat=UNSATISFIABLE	solve_s=0.4	drat_trim=s VERIFIED	check_s=0.3
+our_3R_k13_s1	kissat=UNSATISFIABLE	solve_s=0.9	drat_trim=s VERIFIED	check_s=0.5
+our_3R_k13_s2	kissat=UNSATISFIABLE	solve_s=0.9	drat_trim=s VERIFIED	check_s=0.5
+our_3R_k13_s3	kissat=UNSATISFIABLE	solve_s=0.8	drat_trim=s VERIFIED	check_s=0.5
+claasp_4R_k31_s0	kissat=UNSATISFIABLE	solve_s=3.6	drat_trim=s VERIFIED	check_s=2.5
+our_4R_k31_s1	kissat=UNSATISFIABLE	solve_s=5.3	drat_trim=s VERIFIED	check_s=3.2
+our_4R_k31_s2	kissat=UNSATISFIABLE	solve_s=5.1	drat_trim=s VERIFIED	check_s=3.2
+our_4R_k31_s3	kissat=UNSATISFIABLE	solve_s=5.7	drat_trim=s VERIFIED	check_s=2.8
+ALLDONE

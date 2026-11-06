@@ -1,0 +1,10 @@
+{
+ "rounds": 3,
+ "k": 13,
+ "fixed_trail": false,
+ "status": "UNSATISFIABLE",
+ "build_s": 0.1,
+ "solve_s": 0.9,
+ "vars": 12083,
+ "clauses": 31577
+}

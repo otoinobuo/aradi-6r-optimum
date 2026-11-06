@@ -1,0 +1,9 @@
+{'rounds': 1, 'k': 1, 'status': 'UNSATISFIABLE', 'build_s': 0.0, 'solve_s': 0.1, 'vars': 3007, 'clauses': 8317}
+{'rounds': 2, 'k': 7, 'status': 'UNSATISFIABLE', 'build_s': 0.1, 'solve_s': 0.1, 'vars': 6777, 'clauses': 18411}
+{'rounds': 2, 'k': 8, 'status': 'SATISFIABLE', 'build_s': 0.1, 'solve_s': 0.1, 'vars': 7032, 'clauses': 18920, 'total_weight': 8.0, 'sbox_weight_per_round': [2, 6], 'nonzero_weight_components': {}}
+{'rounds': 3, 'k': 13, 'status': 'UNSATISFIABLE', 'build_s': 0.1, 'solve_s': 0.9, 'vars': 12083, 'clauses': 31577}
+{'rounds': 3, 'k': 14, 'status': 'SATISFIABLE', 'build_s': 0.1, 'solve_s': 0.2, 'vars': 12466, 'clauses': 32342, 'total_weight': 14.0, 'sbox_weight_per_round': [6, 2, 6], 'nonzero_weight_components': {}}
+{'rounds': 4, 'k': 31, 'status': 'UNSATISFIABLE', 'build_s': 0.2, 'solve_s': 6.2, 'vars': 25057, 'clauses': 60067}
+{'rounds': 4, 'k': 32, 'status': 'SATISFIABLE', 'build_s': 0.2, 'solve_s': 0.3, 'vars': 25568, 'clauses': 61088, 'total_weight': 32.0, 'sbox_weight_per_round': [18, 6, 2, 6], 'nonzero_weight_components': {}}
+{'rounds': 5, 'k': 49, 'status': 'UNSATISFIABLE', 'build_s': 0.2, 'solve_s': 41.5, 'vars': 42639, 'clauses': 97773}
+{'rounds': 5, 'k': 50, 'status': 'SATISFIABLE', 'build_s': 0.3, 'solve_s': 2.2, 'vars': 43278, 'clauses': 99050, 'total_weight': 50.0, 'sbox_weight_per_round': [18, 6, 2, 6, 18], 'nonzero_weight_components': {}}

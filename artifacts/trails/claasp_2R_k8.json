@@ -1,0 +1,26 @@
+{
+ "rounds": 2,
+ "k": 8,
+ "fixed_trail": false,
+ "status": "SATISFIABLE",
+ "build_s": 0.1,
+ "solve_s": 0.1,
+ "vars": 7032,
+ "clauses": 18920,
+ "total_weight": 8.0,
+ "plaintext": "0x00000000000000000000000000000001",
+ "round_outputs": {
+  "intermediate_output_0_0": "0x00000000000000000000000000000000",
+  "intermediate_output_0_61": "0x00000000000000000000000040000801",
+  "intermediate_output_0_80": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "intermediate_output_1_0": "0x00000000000000000000000000000000",
+  "intermediate_output_1_61": "0x00000000000000000000000049400ca1",
+  "intermediate_output_1_80": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "intermediate_output_1_81": "0x00000000000000000000000000000000"
+ },
+ "sbox_weight_per_round": [
+  2,
+  6
+ ],
+ "nonzero_weight_components": {}
+}

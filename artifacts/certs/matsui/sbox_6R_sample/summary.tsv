@@ -1,0 +1,4 @@
+w0_07_w01_19	kissat=UNSATISFIABLE	solve_s=15.0	drat_trim=	check_s=8.1	proof_bytes=22597315
+w0_23_w01_38	kissat=UNSATISFIABLE	solve_s=35.4	drat_trim=	check_s=32.0	proof_bytes=46221278
+w0_11_w01_37	kissat=UNSATISFIABLE	solve_s=57.0	drat_trim=	check_s=56.7	proof_bytes=66455061
+w0_12_w01_29	kissat=UNSATISFIABLE	solve_s=284.3	drat_trim=	check_s=230.4	proof_bytes=307483004
