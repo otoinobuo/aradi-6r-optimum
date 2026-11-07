@@ -28,13 +28,15 @@ Bit-sliced-side trails:
                              [34,18,6,2,6,18]=84 (84 in both models). Kept for
                              context: 84 IS achievable, it is just not optimal.
 
-One-to-five-round Matsui bounds B[1..5] = 2,8,14,32,50 (S-box model, CLAASP):
+One-to-five-round Matsui bounds B[1..5] = 2,8,14,32,50 (S-box model):
   claasp_1R_k1.json          k=1 UNSAT  (so B[1] >= 2; optimum 2)
   claasp_2R_k7.json  / _k8   k=7 UNSAT, k=8 SAT   -> B[2] = 8
   claasp_3R_k13.json / _k14  k=13 UNSAT, k=14 SAT -> B[3] = 14
   claasp_4R_k31.json / _k32  k=31 UNSAT, k=32 SAT -> B[4] = 32
   claasp_5R_k49.json / _k50  k=49 UNSAT, k=50 SAT -> B[5] = 50
-  (DRAT certificates for these UNSAT sides are in ../certs/matsui/.)
+  (DRAT for the 1-4R UNSAT sides: ../certs/matsui/ -- four over CLAASP's own CNF (claasp_*_s0),
+   the rest over our independent model. For 5R the DRAT is over our model (../certs/matsui/drat5R/,
+   our_5R_k49_s*); the CLAASP-side 5R k=49 UNSAT in ../bounds/claasp_repro_1_5.txt is kissat-only, no DRAT.)
 
 Table-4-confirming upper bounds (S-box model; reproduced, not corrected):
   claasp_7R_k106_free.json   7 rounds, weight 106 (matches Table 4).

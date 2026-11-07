@@ -43,7 +43,7 @@ reproduces Table 4), the six-round single-key differential optimum is **82**:
   DRAT-certified — four of them (the one-to-four-round windows at the aligned
   start index) over CLAASP's own CNF, the other sixteen over an independent
   S-box model of ours that we validate against CLAASP (identical sets of all
-  39,168 two-round trails, matching one-to-five-round optima, and the designers'
+  39,168 two-round trails of weight 8 (the two-round optimum), matching one-to-five-round optima, and the designers'
   linear layer). So the lower bound uses CLAASP's own clauses for trail validity
   and this one CLAASP-validated model for the pruning bounds.
 
@@ -173,7 +173,7 @@ can be reproduced and its SHA-256 re-checked against the table.
 
 - **CLAASP** — https://github.com/Crypto-TII/claasp , commit
   `f2239d639ae5c4a013947ce9121c6f4464584758` (`f2239d6`); its `VERSION` file
-  reads `v3.2.00` (earlier drafts of this README wrote `v3.2.0`).
+  reads `v3.2.0`.
   The working checkout was clean (no local modifications to CLAASP). This pinned
   commit is dated 2026-01-19 — later than the 2024 paper — but the S-box
   component-clause code we rely on (the DDT-based S-box model and

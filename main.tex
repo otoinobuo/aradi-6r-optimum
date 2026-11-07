@@ -37,7 +37,7 @@ ARADI is a 128-bit block cipher with a 256-bit key, designed by Greene, Motley a
 
 \section{Preliminaries}
 
-\paragraph{ARADI.} We use the designers' specification~\cite{aradi}. The 128-bit state is four 32-bit words $w\,\|\,x\,\|\,y\,\|\,z$. Each round applies a 4-bit S-box (realised as a four-gate Toffoli circuit) in bit-sliced form across the 32 columns, followed by a linear layer and a round-key addition. We verified that CLAASP reproduces the designers' test vector \hex{0x3f09abf400e3bd7403260defb7c53912}; our own S-box and linear layer agree with the designers' rotation amounts, constants and S-box, and with CLAASP on the full set of two-round differential trails (\S\ref{sec:method}).
+\paragraph{ARADI.} We use the designers' specification~\cite{aradi}. The 128-bit state is four 32-bit words $w\,\|\,x\,\|\,y\,\|\,z$. Each round applies a 4-bit S-box (realised as a four-gate Toffoli circuit) in bit-sliced form across the 32 columns, followed by a linear layer and a round-key addition. We verified that CLAASP reproduces the designers' test vector \hex{0x3f09abf400e3bd7403260defb7c53912}; our own S-box and linear layer agree with the designers' rotation amounts, constants and S-box, and with CLAASP on all two-round differential trails of weight 8, the two-round optimum (\S\ref{sec:method}).
 
 \paragraph{Two CLAASP models of the weight.} CLAASP offers two cipher objects for ARADI, and they induce two differential-weight definitions:
 \begin{itemize}
@@ -50,7 +50,7 @@ In both models the optimum over $r$ rounds is the smallest weight $w$ such that 
 \[
 B[1\mathinner{..}5] = 2,\,8,\,14,\,32,\,50,
 \]
-each proved by an UNSAT instance with a DRAT certificate (\S\ref{sec:verify})---four of them over CLAASP's own CNF, the remaining sixteen over an independent S-box model of ours that we validate against CLAASP by the full two-round enumeration of \S\ref{sec:method} (identical sets of all 39{,}168 trails), by the matching one-to-five-round optima, and by the designers' linear layer. These agree with the one-to-five-round entries of Table~4.
+each proved by an UNSAT instance with a DRAT certificate (\S\ref{sec:verify})---four of them over CLAASP's own CNF, the remaining sixteen over an independent S-box model of ours that we validate against CLAASP by the full two-round enumeration of \S\ref{sec:method} (identical sets of all 39{,}168 weight-8 two-round trails), by the matching one-to-five-round optima, and by the designers' linear layer. These agree with the one-to-five-round entries of Table~4.
 
 \section{Method}
 \label{sec:method}

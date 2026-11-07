@@ -8,3 +8,14 @@ round 3: weight 16  (empirical skipped, too small p)
 round 4: weight 8  (empirical -log2 p ≈ 7.87 over 2^14 pairs)
 round 5: weight 16  (empirical skipped, too small p)
 total weight 82
+
+# Monte-Carlo weight estimate of the Table-1 trail (t6R_k82_trail.json, plaintext word 2854044a)
+# Produced by code/verify_empirical.py, 2^22 pairs per round. Empirical total ~82.4, per-round ~[18,6,18,16,8,16].
+
+round 0: hits 15/2^22  -> -log2 p ≈ 18.09
+round 1: hits 65855/2^22  -> -log2 p ≈ 5.99
+round 2: hits 13/2^22  -> -log2 p ≈ 18.30
+round 3: hits 54/2^22  -> -log2 p ≈ 16.25
+round 4: hits 16615/2^22  -> -log2 p ≈ 7.98
+round 5: hits 73/2^22  -> -log2 p ≈ 15.81
+empirical total ≈ 82.42

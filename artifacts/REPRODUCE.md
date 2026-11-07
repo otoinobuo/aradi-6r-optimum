@@ -31,7 +31,7 @@ compute host used for the campaign.
 
 ```
 git clone https://github.com/Crypto-TII/claasp.git
-cd claasp && git checkout f2239d639ae5c4a013947ce9121c6f4464584758   # == f2239d6, VERSION v3.2.00
+cd claasp && git checkout f2239d639ae5c4a013947ce9121c6f4464584758   # == f2239d6, VERSION v3.2.0
 ```
 
 Make CLAASP importable. The canonical path is a full SageMath + CLAASP install
@@ -115,7 +115,7 @@ side at the optimum is the small JSON trail. Logs are in `certs/matsui/`
 python aradi_diff.py --rounds 5 --k 49 --start <s> --dump <out.cnf>   # --dump needs an output path; solve with kissat --unsat + DRAT, check with drat-trim
 ```
 
-(`claasp_1..4R` bounds use CLAASP CNFs directly; see `bounds/claasp_repro_1_5.txt`.)
+(The s=0 one-to-four-round bounds use CLAASP's own CNFs directly; the s=1,2,3 bounds and all five-round bounds use the independent model. The CLAASP-side 5R k=49 UNSAT in `bounds/claasp_repro_1_5.txt` is a kissat result without a DRAT proof.)
 
 ## 7. Upper bound (weight-82 trail)
 
@@ -141,7 +141,7 @@ The bit-sliced lower bound (`certs/bitsliced_6R_k81/`, 945/945 DRAT-verified,
 66.8 CPU-hours) is produced in the **T-model** (`code/tmodel.py`,
 `code/hybrid_bits.py`, `code/make_cubes_bits.py`), which `review/MODEL_ID.md` proves
 equivalent to CLAASP's bit-sliced model by a **hand-written lemma** — validated
-against the real bit-sliced CNF on the 1-5R optima and three known trails
+against the real bit-sliced CNF on the one-to-four-round optima (4R by an 800-cube DRAT campaign), a partial five-round check (305 of 1,568 cubes, all UNSAT), and three known trails
 (`code/bits_fixed.py`, `code/claasp_fixed_check.py`), but **not itself a DRAT
 proof over CLAASP's own bit-sliced clauses**. The bit-sliced upper bound is a
 DRAT-free fixing check: the weight-82 state trail in CLAASP's real bit-sliced
