@@ -41,10 +41,18 @@ ARADI is a 128-bit block cipher with a 256-bit key, designed by Greene, Motley a
 
 \paragraph{Two CLAASP models of the weight.} CLAASP offers two cipher objects for ARADI, and they induce two differential-weight definitions:
 \begin{itemize}
-  \item \emph{S-box model} (\texttt{AradiBlockCipherSBox} with \texttt{SatXorDifferentialModel}). Each active S-box contributes $4-\log_2(\mathrm{DDT})\in\{0,2,3\}$ and the linear layer and key addition are deterministic. This is the model of~\cite{claasping}, \S6.1 and Listing~1.6, and the one that reproduces Table~4; it is our principal model.
-  \item \emph{Bit-sliced model} (\texttt{AradiBlockCipher}). Here the weight is the number of active AND (Toffoli) gates. We use it only as an independent cross-check of the main result (\S\ref{sec:modelind}); \cite{claasping} itself notes that the bit-sliced version yields less accurate differential probabilities, consistent with Table~4 being computed in the S-box model.
+  \item \emph{S-box model} (\texttt{AradiBlockCipherSBox} with \texttt{SatXorDifferentialModel}): the weight of a six-round trail $\alpha=(\alpha_0,\dots,\alpha_6)$ of state differences ($\alpha_0$ the plaintext difference) is
+\[
+  w_{\mathrm S}(\alpha)=\sum_{i=1}^{6}\sum_{j=1}^{32}\bigl(4-\log_2\mathrm{DDT}(a_{ij},b_{ij})\bigr)\in\mathbb{Z}_{\ge 0},
+\]
+where $a_{ij},b_{ij}$ are the input and output differences of the $j$-th S-box in round $i$ (read off from $\alpha_{i-1},\alpha_i$); each active S-box contributes $4-\log_2\mathrm{DDT}\in\{0,2,3\}$ and an inactive one $0$, and the linear layer and key addition are deterministic. This is the model of~\cite{claasping}, \S6.1 and Listing~1.6, and the one that reproduces Table~4; it is our principal model.
+  \item \emph{Bit-sliced model} (\texttt{AradiBlockCipher}): the weight $w_{\mathrm B}(\alpha)$ is the number of active AND (Toffoli) gates along the trail (four gates per S-box column per round). We use it only as an independent cross-check of the main result (\S\ref{sec:modelind}); \cite{claasping} itself notes that the bit-sliced version yields less accurate differential probabilities, consistent with Table~4 being computed in the S-box model.
 \end{itemize}
-In both models the optimum over $r$ rounds is the smallest weight $w$ such that a trail of weight $w$ exists and no trail of weight $w-1$ exists, in the single-key setting (key difference fixed to zero, plaintext difference non-zero), exactly as in Table~4.
+In both models the $r$-round optimum is
+\[
+  \mathrm{opt}_M(r)=\min\bigl\{\,w_M(\alpha)\ :\ \alpha\text{ a valid single-key $r$-round trail},\ \alpha_0\neq 0\,\bigr\},\qquad M\in\{\mathrm S,\mathrm B\},
+\]
+with the key difference fixed to zero, exactly as in Table~4; this paper establishes $\mathrm{opt}_{\mathrm S}(6)=\mathrm{opt}_{\mathrm B}(6)=82$.
 
 \paragraph{Matsui bounds.} For a window of $r$ consecutive rounds beginning at round index $s \bmod 4$ we write $B_s[r]$ for a lower bound on the trail weight of that window. We established, for every starting index, the exact one-to-five-round optima
 \[
@@ -57,7 +65,7 @@ each proved by an UNSAT instance with a DRAT certificate (\S\ref{sec:verify})---
 
 \paragraph{Hybrid CNF for the lower bound.} To prove that no six-round trail of weight $\le 81$ exists we build a CNF with three parts:
 \begin{enumerate}
-  \item the component clauses that CLAASP itself emits for the six-round S-box model (\texttt{build\_xor\_differential\_trail\_model} with no weight counter), so that the set of satisfying assignments is exactly CLAASP's set of valid trails;
+  \item the component clauses that CLAASP itself emits for the six-round S-box model (\texttt{build\_\allowbreak xor\_\allowbreak differential\_\allowbreak trail\_\allowbreak model} with no weight counter), so that the set of satisfying assignments is exactly CLAASP's set of valid trails;
   \item a bidirectional sequential counter over the per-S-box Hamming-weight variables, asserting that the total weight is at most 81;
   \item Matsui-style window clauses: for each sub-window $[s,e]$ the prefix and suffix weights are bounded below by the corresponding $B$ values above, which prunes the search without removing any trail of weight $\le 81$.
 \end{enumerate}
@@ -132,7 +140,7 @@ The remaining open items are stated plainly: the bit-sliced lower bound rests on
 
 \section{Honest use of AI}
 
-The research question (``is the six-round entry of Table~4 optimal?''), the claims made here, and the check of every number against the primary result files were decided and carried out by the author, Nobuo Otoi. The search for trails and the SAT/UNSAT computations were executed by an AI coding assistant (Claude Code) under the author's direction. The lower bound does not rest on the assistant's or the solver's word: each UNSAT result is an independent DRAT certificate checked by \texttt{drat-trim}, and the upper bound is a trail re-verified by the designers' formula and by Monte-Carlo estimation. The assistant's own reading of the work is not treated as a review or as independent evidence.
+The research question, the claims, and the check of every number against the primary files were the author's; the trail search and the SAT/UNSAT runs were executed by an AI coding assistant (Claude Code) under his direction. Nothing rests on the assistant's or the solver's word: each lower bound is an independent DRAT certificate checked by \texttt{drat-trim}, the upper bound is re-verified by the designers' formula and by Monte-Carlo estimation, and the assistant's own reading is not treated as evidence.
 
 \begin{thebibliography}{9}
 
