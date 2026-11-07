@@ -16,3 +16,5 @@ __pycache__/
 *.pyc
 # large binaries / third-party PDFs (keep >20MB out; PDF of our own build is small, allowed)
 *.tar.gz
+SUBMISSION.md
+dist/
