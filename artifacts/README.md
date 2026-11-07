@@ -207,5 +207,5 @@ the work is not treated as a review or as independent evidence.
 ## 9. Manuscript and DOI
 
 The accompanying manuscript is `main.pdf`. A DOI for this archive is
-**to be assigned** on deposit. The licence is stated separately (see the end of
+**10.5281/zenodo.24025026** (concept DOI, resolving to the latest version). The licence is stated separately (see the end of
 REPRODUCE.md); it is not fixed in this README.
