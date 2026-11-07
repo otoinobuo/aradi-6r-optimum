@@ -1,83 +1,124 @@
-# MODEL_ID — ビットスライス版 `AradiBlockCipher`（重み = AND ゲート数）の 6R 最適は 84 か（k=83 の決着）
+# Model identification: the bit-sliced six-round optimum of ARADI is also 82
 
-日付: 2026-11-06 ／ 場所: `~/explore/aradi/review/modelid/` ／ 本番 SPECK・`~/speck-probe` には不介入（probe の kissat 1 本は走行中のまま）。
+This note settles which weight definition Table 4 of ePrint 2024/1324 uses for
+the six-round entry, and shows that the "84 is really the bit-sliced value"
+reading does not hold: in the bit-sliced model `AradiBlockCipher` (weight =
+number of active AND / Toffoli gates) the six-round single-key differential
+optimum is **82**, not 84. Reference files are under `modelid/`.
 
-## 結論
+## Result
 
-**ビットスライス版 `AradiBlockCipher`（重み = AND ゲート数）の 6R 最適重みは 82。** k=83 SAT・k=82 SAT（トレイルを CLAASP の実ビットスライス CNF で固定検証）、k=81 UNSAT（T モデル無制約 kissat ＋ cube 945 本すべて UNSAT・DRAT VERIFIED）。
-よって「Table 4 の 84 はビットスライス版で計算された最適値」という説明は**成立しない**。84 は S-box 版（最適 82）でもビットスライス版（最適 82）でも最適値ではなく、Table 4 の 6R は同じ定義のまま誤り。
-両モデルの 6R 最適が一致（82）するのは偶然ではなく、重み 82 の状態トレイル（段別 [18,6,18,16,8,16]）が使う S-box 遷移がすべて T = DDT 重みとなる組だけで構成されているため（gate-level でも同じコストで実現できる）。
+**The bit-sliced six-round optimum is 82.** Both bounds:
 
-- 発見: T モデル（下記）無制約 k=83（Matsui 窓 = 証明済み bitsliced 下界）が kissat で **SAT（3,207 秒）**。
-- 検証: 復号した状態トレイル（`modelid/tm6R/t6R_k83_trail.json`）を **CLAASP の実ビットスライス CNF（`AradiBlockCipher` + `SatXorDifferentialModel`）に全固定 → k=83 SAT／k=82 UNSAT**、AND 重み段別 [18, 7, 18, 16, 8, 16] = 83（`bits_fixed.py`）。
-  設計者式（DDT）での重みも 83、乱数実測（2^22 組/段）≈ 83.6。
-- トレイル（w‖x‖y‖z、16 進）: 平文 0‖42a12250‖0‖0 → 0‖40200200‖0‖0 → 0‖c1304288‖0‖80204000 → b0304101‖b0104101‖0‖0 → 00202120‖0‖0‖0 → 08690029‖0‖0‖0 → e4497639‖0‖e408f639‖0。
-  S-box 版の 82 トレイル族（段別 [18,6,18,16,8,16]）と同形で、第 2 段だけ gate-level では 7。
-- 続いて T モデル無制約 k=82 も **SAT（458 秒）**。復号トレイル（`modelid/tm6R/t6R_k82_trail.json`、段別 [18,6,18,16,8,16] = 82）を CLAASP の実ビットスライス CNF に全固定 → **k=82 SAT／k=81 UNSAT（AND 重み 82）**。同じ状態トレイルは S-box 版（DDT）でも 82（CLAASP S-box モデル固定 k=82 SAT／k=81 UNSAT）。
-  平文 0‖2854044a‖0‖0 → 0‖08040040‖0‖0 → 0‖18260851‖0‖0 → 16062820‖16022820‖0‖0 → 00040424‖0‖0‖0 → 210d2005‖0‖0‖0 → 3c892ec7‖0‖1c813ec7‖0。
-- k=81: T モデル無制約（窓付き）が UNSAT（4,935 秒）、cube 945 本（w0 ∈ [2,31], w01 ∈ [w0+2,49]）すべて UNSAT・drat-trim VERIFIED（§5）。→ **bitsliced 6R 最適 = 82**（下界は補題＋証明済み bitsliced 下界＋DRAT に依拠）。
+- **Upper bound.** The weight-82 state trail (per-round AND profile
+  `[18,6,18,16,8,16]`, plaintext word `2854044a`) fixed into CLAASP's real
+  bit-sliced CNF (`AradiBlockCipher` + `SatXorDifferentialModel`) gives k=82 SAT
+  / k=81 UNSAT (AND weight 82). The same state trail is weight 82 in CLAASP's
+  S-box model as well (fixed: k=82 SAT / k=81 UNSAT). Solver-independent checks:
+  designers'-formula weight 82, Monte-Carlo (2^22 pairs/round) ≈ 82.
+- **Lower bound.** Weight 81 is UNSAT: the unconstrained T-model instance is
+  UNSAT under `kissat` (4,935 s), and the 945-cube campaign
+  (`w0 in [2,31]`, `w01 in [w0+2,49]`) is 945/945 UNSAT with `drat-trim`-verified
+  binary DRAT proofs (0 SAT, 0 FAIL; `modelid/run_t6R_k81/`).
 
-## 方式
+So 84 is optimal under **neither** weight definition — the S-box optimum is 82
+and the bit-sliced optimum is 82 — and the "Table-4 84 is the bit-sliced value"
+explanation is refuted; the six-round cell is wrong under the same definition.
+That the two models agree at 82 is not a coincidence: the weight-82 state trail
+uses only S-box transitions whose gate-level cost equals the DDT weight, so it is
+realisable at the same cost bit-sliced.
 
-### 1. 圧縮モデル（T モデル）と同値補題
+**Caveat (reviewer-facing).** The bit-sliced lower bound rests on a hand-written
+equivalence lemma (§1), so it is of a different standing from the S-box lower
+bound, which is a DRAT proof over CLAASP's own component clauses. See §4.
 
-CLAASP のビットスライス版 SAT モデルは、各 Toffoli AND ゲート（1 ラウンド 4 ゲート × 32 列）に `cnf_and_differential` を置く:
-hw ⇔ (Δa ∨ Δb)、hw=1 なら出力差分は自由、hw=0 なら出力差分 0。重み = Σ hw。線形層・鍵加算は決定的。
+## 1. Compressed model (T-model) and the equivalence lemma
 
-**補題.** 状態差分（平文差分と各段の round_output 差分）を固定すると、各 S-box 列の内部 AND 出力の選択は列ごとに独立で、その列の重みは
-T(din, dout) = 「CLAASP の順（x^=w&y, z^=x&y, y^=w&z, w^=x&z）の 4 ゲートで din→dout を実現する最小の活性 AND 数」以上であり、T は達成可能。
-よって bitsliced モデルの r 段最小重み = S-box レベルのトレイル (α₀,…,α_r) 上の Σ_i T(din_i, dout_i) の最小値。
-T は 16×16 の全列挙で得る（`tmodel.py --table`）: 可能な (din,dout) は 161 組（DDT の支持 97 組を真に含む。DDT=0 の 64 組も gate-level では可能）、重みは {0:1, 2:16, 3:32, 4:112}。
-DDT 支持内では常に T ≥ 4−log2(DDT)（等号でない組が多数）。**このため S-box 版の下界は bitsliced には流用できず、bitsliced 専用の下界を別途証明した。**
+CLAASP's bit-sliced SAT model places a `cnf_and_differential` on each Toffoli
+AND gate (4 gates/round × 32 columns): `hw ⇔ (Δa ∨ Δb)`; if `hw=1` the output
+difference is free, if `hw=0` it is 0. Weight = Σ hw. The linear layer and key
+addition are deterministic.
 
-T モデル（`review/tmodel.py`）: `aradi_diff.py` と同じ線形層（設計者式と全 i で一致確認済み）、S-box ごとに unary の u₁..u₄、(din,dout) ごとに T の値を強制、双方向順序カウンタ、Matsui 窓。
+**Lemma.** Fixing the state differences (the plaintext difference and each
+round's `round_output` difference), the choice of the internal AND outputs in
+each S-box column is independent per column, and that column's weight is at
+least `T(din, dout)` = the minimum number of active ANDs that realise `din→dout`
+with CLAASP's four gates (`x^=w&y, z^=x&y, y^=w&z, w^=x&z`), and `T` is
+achievable. Hence the r-round minimum bit-sliced weight equals the minimum over
+S-box-level trails `(α₀,…,α_r)` of `Σ_i T(din_i, dout_i)`.
 
-### 2. T モデルと CLAASP ビットスライス CNF の整合（クロスチェック）
+`T` is obtained by full 16×16 enumeration (`tmodel.py --table`): 161 `(din,dout)`
+pairs are possible (strictly containing the 97 pairs of the DDT support; the 64
+DDT=0 pairs are gate-level possible), with weights `{0:1, 2:16, 3:32, 4:112}`.
+Within the DDT support, `T ≥ 4 − log2(DDT)` always, strictly for many pairs.
+**This is why the S-box lower bound cannot be reused for the bit-sliced model and
+a bit-sliced-specific lower bound had to be proved separately.**
 
-| 検査 | CLAASP bitsliced CNF | T モデル |
+The T-model (`review/tmodel.py`) uses the same linear layer as `aradi_diff.py`
+(checked identical to the designers' formula for all `i`), unary `u₁..u₄` per
+S-box, the `T` value forced per `(din,dout)`, a bidirectional sequential counter,
+and Matsui windows.
+
+## 2. Cross-check: T-model against CLAASP's bit-sliced CNF
+
+| Check | CLAASP bit-sliced CNF | T-model |
 |---|---|---|
-| 1R/2R/3R 最適（start 0..3） | 2/8/14（k=1,7,13 UNSAT を DRAT 検証、`modelid/small/summary.tsv`） | 2/8/14（k=1,7,13 UNSAT 0.1/0.8/3.0 s） |
-| 4R 最適（start 0..3） | k=31 UNSAT: cube 200 本 × 4 start = **800 本すべて UNSAT・DRAT VERIFIED**（CPU 解 4.8 h＋検証 3.4 h、`modelid/run_4R_k31_s*/`）、k=32 SAT | k=31 UNSAT 19 s、k=32 SAT 5.9 s |
-| 5R（start 0..3） | k=49: cube 305 本まで全 UNSAT・VERIFIED で中断（T モデルに切替、`modelid/run_5R_k49_s*/`） | k=49 UNSAT（窓=1〜4R 証明済み下界）各 46〜54 s、**DRAT VERIFIED 4 本**、k=50 SAT（`modelid/tm5R/summary.tsv`） |
-| 既知の gate-level 84 トレイル（`bits_6R_k84_trail.json`、段別 [34,18,6,2,6,18]） | k=84 SAT／k=83 UNSAT（固定） | k=84 SAT／k=83 UNSAT（固定） |
-| S-box 版 82 トレイル（`claasp_6R_k82_free_trail.json`） | gate-level 88 | T 重み 88（k=87 UNSAT／k=88 SAT 固定） |
-| T モデル無制約 6R k=84 の解（段別 [34,18,6,2,6,18]、平文 e6d5174c‖0‖0‖0） | 固定して k=84 SAT／k=83 UNSAT（gate 重み 84） | SAT 29 s |
+| 1R/2R/3R optima (start 0..3) | 2 / 8 / 14 (k=1,7,13 UNSAT, DRAT-verified, `modelid/small/summary.tsv`) | 2 / 8 / 14 (k=1,7,13 UNSAT) |
+| 4R optimum (start 0..3) | k=31 UNSAT: 200 cubes × 4 starts = **800 cubes all UNSAT, DRAT VERIFIED** (`modelid/run_4R_k31_s*/`); k=32 SAT | k=31 UNSAT, k=32 SAT |
+| 5R (start 0..3) | k=49: all UNSAT through **305 cubes, VERIFIED**, then stopped (switched to T-model, `modelid/run_5R_k49_s*/`) | k=49 UNSAT (window = proven 1–4R lower bounds), **DRAT VERIFIED (4)**, k=50 SAT (`modelid/tm5R/summary.tsv`) |
+| known gate-level 84 trail (`bits_6R_k84_trail.json`, `[34,18,6,2,6,18]`) | k=84 SAT / k=83 UNSAT (fixed) | k=84 SAT / k=83 UNSAT (fixed) |
+| S-box weight-82 trail (`claasp_6R_k82_free_trail.json`) | gate-level 88 | T-weight 88 (k=87 UNSAT / k=88 SAT, fixed) |
 
-### 3. 下界（bitsliced 専用、すべて UNSAT＋DRAT VERIFIED）
+So the T-model matches CLAASP's bit-sliced CNF on the one-to-four-round optima
+(the four-round case certified by an 800-cube DRAT campaign), on a partial
+five-round check (305 of 1,568 cubes, all UNSAT), and on three known trails.
 
-B_bits[s][r]（開始添字 s=0..3 共通）: 1R=2, 2R=8, 3R=14, 4R=32, 5R=50。
-6R の窓用: 6R ≥ 5R+1R = 52（自明）。cube 範囲: w0 ∈ [2, 83−50=33], w01 ∈ [w0+2, 83−32=51] → 1,040 cube。
+## 3. Bit-sliced lower bounds (all UNSAT + DRAT VERIFIED)
 
-### 4. 6R k=83 本番
+`B_bits[s][r]` (identical for all start indices `s=0..3`): 1R=2, 2R=8, 3R=14,
+4R=32, 5R=50 — each an UNSAT-with-DRAT instance at weight = optimum−1. The 6R
+window uses `6R ≥ 5R+1R = 52` (trivial). These are the window constraints used by
+the pruning, so they are implied, not over-constraining.
 
-`modelid/tm6R/t6R_k83.cnf`（63,459 変数・393,131 節・窓 20）を 1,040 cube に分割、`kissat --unsat` + DRAT、drat-trim で全数検証、21 並列（drat-trim は同時 6 本に制限、MemAvailable ガード）。
-並行して無制約 k=83（窓付き、2 時間）。
+**k=81 campaign** (`modelid/run_t6R_k81/`): 945/945 cubes UNSAT, all DRAT
+VERIFIED; 0 SAT, 0 FAIL. The cube set and the summary set agree; each proof's
+SHA-256 is recorded (`summary.tsv`: cube / solve_s / VERIFIED / sha256;
+`detail.tsv`: verify_s, proof bytes, RSS). CPU: solve+proof 31.3 h, drat-trim
+35.5 h, 66.8 h total (3 h 12 min wall, 21-way); hardest cube `w0_16_w01_29`
+(740 s solve); proofs 57.7 GB total (deleted after verification); drat-trim peak
+RSS 509 MB. Together with the unconstrained `kissat` UNSAT, this gives the
+bit-sliced six-round optimum = 82.
 
-k=83 cube キャンペーンは 330/1,040 cube（w0 ≤ 9 帯）まで全 UNSAT・DRAT VERIFIED の時点で、無制約 k=83 が SAT になったため停止（`modelid/run_t6R_k83/summary.tsv`、CPU 解 7.8 h＋検証 10.0 h）。
-UNSAT だった cube は「w0 ≤ 9 帯には重み ≤83 の bitsliced トレイルが無い」ことの証明（発見トレイルは w0=18）。
+## 4. Dependency of the claim (reviewer-facing)
 
-## 5. 正確な最適値の探索（進行中）
+The bit-sliced optimum = 82 rests on:
 
-- k=82: cube キャンペーンは 122/992 cube（w0 ≤ 4 帯）全 UNSAT・VERIFIED の時点で、無制約 k=82 が SAT になったため停止（`modelid/run_t6R_k82/`）。
-- k=81: T モデル cube キャンペーン（w0 ∈ [2,31], w01 ∈ [w0+2,49] → 945 cube）、`kissat --unsat` + DRAT、21 並列（`modelid/run_t6R_k81/`）＋無制約 k=81（3 時間）。全 UNSAT なら bitsliced 6R 最適 = 82。
+1. **Upper bound** — the weight-82 state trail fixed into **CLAASP's real
+   bit-sliced CNF** gives k=82 SAT (AND weight 82); solver-independent checks:
+   designers' formula 82, Monte-Carlo ≈ 82.
+2. **Lemma (§1)** — the bit-sliced minimum weight equals the T-model minimum
+   weight; `T` is the full enumeration of CLAASP's `cnf_and_differential`
+   semantics over the four gates, with per-column independence.
+3. **T-model ⇄ CLAASP consistency (§2)** — 1–4R optima agree (4R certified by
+   CLAASP's own 800-cube DRAT), 5R proved in the T-model (CLAASP side matched
+   through 305 cubes, then stopped), and three known trails agree (84 / 88 / 82).
+4. **B_bits[1..5] = 2,8,14,32,50** (all start indices) — all UNSAT + DRAT.
+5. **k=81 UNSAT** — 945 cubes all DRAT VERIFIED, plus the unconstrained `kissat`
+   UNSAT.
 
-- 無制約 k=81（窓付き、証明なし）: **UNSATISFIABLE（kissat 4.0.4、4,935 秒）**。→ bitsliced 6R 最適 = 82（kissat 判定）。DRAT 付きの確定は cube キャンペーンで取得中。
+The remaining soft spot is (2): the lemma is a hand proof. A fully machine-checked
+route would cube-and-DRAT CLAASP's bit-sliced CNF directly at k=81, but the
+four-round experience puts that at 100–1000× the cost. This is why the bit-sliced
+optimum = 82 is reported as *supported (lemma-dependent)*, distinct from the
+S-box optimum = 82, which is *certified* over CLAASP's own clauses.
 
-- k=81 cube キャンペーン（`modelid/run_t6R_k81/`）: **945/945 UNSAT・DRAT VERIFIED、SAT 0・FAIL 0**。cube 集合と summary の集合は一致、各証明の sha256 を記録（`summary.tsv`: cube名／解秒／VERIFIED／sha256、`detail.tsv`: 検証秒・proof バイト・RSS）。
-  CPU: 解＋証明生成 31.3 h、drat-trim 35.5 h、合計 66.8 h（壁時計 3 時間 12 分、21 並列）。最難 cube `w0_16_w01_29` 解 740 秒。証明合計 57.7 GB（検証後に削除）。drat-trim 最大 RSS 509 MB、OOM ガード発動 0 回。
+## Artifacts
 
-## 6. 主張の依存関係（査読向け）
-
-bitsliced 6R 最適 = 82 は次に依拠する:
-1. 上界: 重み 82 の状態トレイルを **CLAASP の実ビットスライス CNF** に全固定して k=82 SAT（AND 重み 82）。ソルバ非依存の検算: 設計者式で DDT 重み 82、乱数実測 ≈82。
-2. 補題（§1）: bitsliced モデルの最小重み = T モデルの最小重み。T は CLAASP の `cnf_and_differential` の意味論（hw ⇔ 入力差分活性、活性なら出力自由）を 4 ゲートに適用した全列挙。独立性は「列ごとの AND 出力が他列に影響しない」ことから従う。
-3. T モデルと CLAASP bitsliced CNF の整合: 1〜4R の最適が一致（4R は CLAASP CNF 側も 800 cube DRAT）、5R は T モデルで証明（CLAASP CNF 側は 305 cube まで一致して中断）、既知トレイル 3 本の重み一致（84・88・82/83）。
-4. 下界 B_bits[1..5] = 2,8,14,32,50（全開始添字）: すべて UNSAT＋DRAT。窓制約はこれらの含意なので過剰制約ではない。
-5. k=81 UNSAT: 945 cube すべて DRAT VERIFIED（＋無制約 kissat の UNSAT）。
-弱点として残るのは 2（補題は手証明。機械検証したければ T モデル k=81 UNSAT の代わりに CLAASP bitsliced CNF の k=81 を直接 cube+DRAT すればよいが、4R の経験では 100〜1000 倍のコスト）。
-
-## 生成物
-
-- `review/tmodel.py`（T モデル生成・固定・表）、`review/hybrid_bits.py`（CLAASP bitsliced の混成 CNF、`--start`）、`review/make_cubes_bits.py`、`review/cube_drat_one_6R.sh`、`review/cube_drat_sched.py`
-- `modelid/T_table.txt`（T の 16×16 表）、`modelid/small/`（1〜3R）、`modelid/run_4R_k31_s*/`（4R 800 cube）、`modelid/run_5R_k49_s*/`（中断分）、`modelid/tm5R/`（5R T モデル DRAT）、`modelid/tm6R/`（6R CNF・無制約結果・k=84 トレイル）、`modelid/run_t6R_k83/`（本番 summary.tsv／detail.tsv／logs）
-- `modelid/sat_lottery/`（CLAASP bitsliced CNF での k=83 SAT 方向くじ、482/2,628 本・SAT なしで中断）
+- `review/tmodel.py` (T-model build / fixing / table), `review/hybrid_bits.py`
+  (CLAASP bit-sliced hybrid CNF, `--start`), `review/make_cubes_bits.py`,
+  `review/cube_drat_one_6R.sh`, `review/cube_drat_sched.py`.
+- `modelid/T_table.txt` (the 16×16 `T` table), `modelid/small/` (1–3R),
+  `modelid/run_4R_k31_s*/` (4R, 800 cubes), `modelid/run_5R_k49_s*/` (partial 5R),
+  `modelid/tm5R/` (5R T-model DRAT), `modelid/tm6R/` (6R CNF, unconstrained
+  results, k=84 trail), `modelid/run_t6R_k81/` (the k=81 campaign:
+  `summary.tsv` / `detail.tsv` / logs).

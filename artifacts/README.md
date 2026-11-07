@@ -37,9 +37,15 @@ reproduces Table 4), the six-round single-key differential optimum is **82**:
   **945** subproblems, every one UNSAT. All 945 UNSAT results carry a binary
   DRAT proof verified by `drat-trim` (`VERIFIED`, 0 failures). The twenty
   one-to-five-round Matsui bounds `B[1..5] = 2, 8, 14, 32, 50` that the pruning
-  relies on are likewise UNSAT with verified DRAT proofs. **Here the DRAT proofs
-  are over CLAASP's own component clauses**, so the lower bound does not depend
-  on any re-modelling by us.
+  relies on are likewise UNSAT with verified DRAT proofs. Here the
+  trail-validity clauses are CLAASP's own; the weight counter and the Matsui
+  window pruning are ours. The window bounds `B[1..5]` are themselves
+  DRAT-certified — four of them (the one-to-four-round windows at the aligned
+  start index) over CLAASP's own CNF, the other sixteen over an independent
+  S-box model of ours that we validate against CLAASP (identical sets of all
+  39,168 two-round trails, matching one-to-five-round optima, and the designers'
+  linear layer). So the lower bound uses CLAASP's own clauses for trail validity
+  and this one CLAASP-validated model for the pruning bounds.
 
 ### Cross-check — supported but lemma-dependent (bit-sliced model)
 
@@ -51,8 +57,10 @@ AND / Toffoli gates) the six-round optimum is **also 82**:
 - **Lower bound:** weight 81 is UNSAT by the same cube-and-conquer method
   (945/945 cubes DRAT-verified) **in a compressed "T-model"**. The T-model is
   proved equivalent to CLAASP's bit-sliced model by a **hand-written lemma**
-  (validated against the real bit-sliced CNF on the one-to-five-round optima and
-  on three known trails). **Unlike the S-box lower bound, this one is not a DRAT
+  (validated against the real bit-sliced CNF on the one-to-four-round optima
+  (the four-round case by an 800-cube DRAT campaign), on a partial five-round
+  check (305 of 1,568 cubes, all UNSAT), and on three known trails). **Unlike
+  the S-box lower bound, this one is not a DRAT
   proof over CLAASP's own bit-sliced clauses; it additionally rests on that
   equivalence lemma, and we flag it as such.**
 
@@ -120,7 +128,11 @@ over from the compute host; a verifier must edit that path to their own build
 See `trails/README.txt` for a one-line provenance of each file. The certified
 weight-82 trail of Table 1 of the manuscript is `trails/t6R_k82_trail.json`
 (plaintext word `2854044a`, per-round `[18,6,18,16,8,16]`); it is optimal in
-both models. `trails/claasp_6R_k82_free_trail.json` and
+both models. This trail was found by the author's own search; it is a valid
+weight-82 trail of CLAASP's S-box model, verified by fixing it in CLAASP's S-box
+CNF (k=82 SAT / k=81 UNSAT) and in CLAASP's real bit-sliced CNF (k=82 SAT / k=81
+UNSAT), and its designers'-formula weight recomputation (82) is bundled in
+`trails/t6R_k82_verify_trail.txt`. `trails/claasp_6R_k82_free_trail.json` and
 `claasp_6R_k83_free_trail.json` are two further weight-82 trails from CLAASP's
 S-box model. `trails/bits_6R_k84_trail.json` is the known weight-84 trail (for
 context). `claasp_{1..5}R_k*.json` are the one-to-five-round optimum (and
@@ -160,13 +172,21 @@ can be reproduced and its SHA-256 re-checked against the table.
 ## 7. Dependencies
 
 - **CLAASP** — https://github.com/Crypto-TII/claasp , commit
-  `f2239d639ae5c4a013947ce9121c6f4464584758` (`f2239d6`), `VERSION` = `v3.2.0`.
-  The working checkout was clean (no local modifications to CLAASP). The CNF is
+  `f2239d639ae5c4a013947ce9121c6f4464584758` (`f2239d6`); its `VERSION` file
+  reads `v3.2.00` (earlier drafts of this README wrote `v3.2.0`).
+  The working checkout was clean (no local modifications to CLAASP). This pinned
+  commit is dated 2026-01-19 — later than the 2024 paper — but the S-box
+  component-clause code we rely on (the DDT-based S-box model and
+  `cnf_and_differential`) is unchanged from its 2024-08 first version, so the
+  clauses match those of ePrint 2024/1324. The CNF is
   produced by CLAASP's own code; the SAT path was run with a minimal pure-Python
   SageMath stub in place of a full SageMath install (CLAASP's SAT path touches
   only `SBox` DDT / small helpers; the stub is bundled here under `code/sagestub/` for audit), and `espresso` from classabbyamp/espresso-
   logic. A full SageMath + CLAASP install at the pinned commit is the canonical
   path and is expected to give identical clauses; see REPRODUCE.md.
+- **Python packages** — `python-sat` (`pysat`), required by CLAASP and by
+  `aradi_diff.py`; `numpy`, required by `verify_empirical.py` (Monte-Carlo
+  estimate).
 - **kissat** — https://github.com/arminbiere/kissat , version 4.0.4
   (tag `rel-4.0.4`, commit `8af8e56f174b778aef3aa45af9f739b2a5f492c2`).
 - **drat-trim** — https://github.com/marijnheule/drat-trim , built with

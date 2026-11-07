@@ -1,57 +1,78 @@
-# P2a — 7R=106・8R=122（Table 4）を下回る S-box 版トレイルの SAT 方向探索（結果: 両方とも時間予算内で未決着）
+# P2a — SAT-direction search for S-box trails below the Table-4 7R/8R entries (result: inconclusive within budget)
 
-日付: 2026-11-06 13:52〜19:58 JST ／ 対象: CLAASP S-box 版モデル（混成 CNF = CLAASP 部品節＋双方向順序カウンタ＋Matsui 窓）、単一鍵、start=0。
-最適性の UNSAT 追認は目的外。空振りは「未決着」であり **Table 4 の追認ではない**。
+Target: CLAASP S-box model (hybrid CNF = CLAASP component clauses + bidirectional
+sequential counter + Matsui windows), single-key, `start=0`. Goal: find a trail
+lighter than the Table-4 entries — weight ≤ 105 at seven rounds, ≤ 121 at eight
+rounds. This was **not** a certified optimality (UNSAT) search; a search that
+finds nothing is *inconclusive*, **not** a confirmation of Table 4.
 
-## 結論（1 行ずつ）
+## Result (one line each)
 
-- **7R: 重み ≤ 105 のトレイルは時間予算（6 時間・最大 18 並列・CPU 合計 111.6 時間）内では見つからず → 「k=105 以下は未決着」。** SAT は 0 本。
-- **8R: 重み ≤ 121 のトレイルは時間予算（4 時間・5 並列・CPU 合計 20.0 時間）内では見つからず → 「k=121 以下は未決着」。** SAT は 0 本。cube の 1/3 しか試せていない。
+- **7R: no trail of weight ≤ 105 was found within the time budget (6 h wall,
+  up to 18-way, 111.6 CPU-hours) → "k ≤ 105 undecided".** 0 SAT.
+- **8R: no trail of weight ≤ 121 was found within the time budget (4 h wall,
+  5-way, 20.0 CPU-hours) → "k ≤ 121 undecided".** 0 SAT; only ~1/3 of the cubes
+  were attempted.
 
-## 設定
+## Setup
 
-| 項目 | 7R | 8R |
+| | 7R | 8R |
 |---|---|---|
-| bounds.json | 6R を追加: s=0: 82（確定）、s=1..3: 52（= B_s[5]+2、証明済み下界） | さらに 7R を追加: s=0: 84、s=1..3: 54（= 6R 下界+2） |
-| CNF | `cnf/hyb_7R_k105.cnf`（104,964 変数・406,288 節・窓 27） | `cnf/hyb_8R_k121.cnf`（135,212 変数・525,980 節・窓 35） |
-| cube | `make_cubes.py --split2` → 1,378 本（w0∈[2,53], w01∈[w0+2,55]）、w0・w01 昇順 | 2,211 本（w0∈[2,67], w01∈[w0+2,69]）、優先順 w0=6,18,8,16,2 → 残り昇順 |
-| ソルバ | kissat 4.0.4（既定設定、`--unsat` なし）、nice 10 | 同じ |
-| 予算 | 第 1 パス 240 秒/本・18 並列、第 2 パス（未決着のみ、優先 w0=6,18,8,16）900 秒/本・18 並列、合計 6 時間（13:52〜19:52） | 180 秒/本・5 並列・4 時間（15:57〜19:57） |
-| 無制約 | 混成 k=105 と CLAASP 素の k=105 を各 2 時間 → いずれも未決着 | （なし） |
-| OOM ガード | MemAvailable<2 GB で起動抑制・<1.2 GB で SIGSTOP（発動 0 回、空きは常時 8.2〜8.4 GB） | 同じ |
+| bounds.json | adds 6R: `s=0`: 82 (certified), `s=1..3`: 52 (= `B_s[5]+2`, proven lower bound) | further adds 7R: `s=0`: 84, `s=1..3`: 54 (= 6R lower bound + 2) |
+| CNF | `cnf/hyb_7R_k105.cnf` (104,964 vars, 406,288 clauses, 27 windows) | `cnf/hyb_8R_k121.cnf` (135,212 vars, 525,980 clauses, 35 windows) |
+| cubes | `make_cubes.py --split2` → 1,378 (`w0∈[2,53]`, `w01∈[w0+2,55]`), ascending | 2,211 (`w0∈[2,67]`, `w01∈[w0+2,69]`), priority `w0=6,18,8,16,2` then ascending |
+| solver | kissat 4.0.4 (default settings, no `--unsat`), nice 10 | same |
+| budget | pass 1: 240 s/cube, 18-way; pass 2 (undecided only, priority `w0=6,18,8,16`): 900 s/cube, 18-way; 6 h total | 180 s/cube, 5-way, 4 h total |
+| unconstrained | hybrid k=105 and bare CLAASP k=105, 2 h each → both undecided | (none) |
 
-## 7R k=105 の結果
+## 7R k=105
 
-| パス | 本数 | UNSAT | 未決着 | SAT | CPU 秒 |
+| Pass | Cubes | UNSAT | Undecided | SAT | CPU s |
 |---|---|---|---|---|---|
-| 第 1 パス（240 s） | 1,378 | 786 | 592 | 0 | 197,893 |
-| 第 2 パス（900 s、未決着 592 本のうち優先順 278 本） | 278 | 143 | 135 | 0 | 189,578 |
-| 無制約 2 本（7,200 s） | 2 | 0 | 2 | 0 | 14,400 |
-| **合計** | | **929 cube が UNSAT 確定、449 cube が未決着** | | **0** | **401,871（111.6 h）** |
+| pass 1 (240 s) | 1,378 | 786 | 592 | 0 | 197,893 |
+| pass 2 (900 s; 278 of the 592 undecided, by priority) | 278 | 143 | 135 | 0 | 189,578 |
+| unconstrained ×2 (7,200 s) | 2 | 0 | 2 | 0 | 14,400 |
+| **total** | | **929 UNSAT, 449 undecided** | | **0** | **401,871 (111.6 h)** |
 
-w0 帯ごとの残り未決着 cube 数（両パス後）: w0=8:6, 9:4, 10:20, 11:16, 12:19, 13:15, 14:24, 15:28, 16:15, 17:27, 18:14, 19:23, 20:22, 21:22, 22:19, 23:18, 24:18, 25:17, 26:17, 27:15, 28:14, 29:12, 30:11, 31:11, 32:9, 33:8, 34:7, 35:5, 36:5, 37:3, 38:2, 39:2, 40:1。
-w0≤7 と w0≥41 は全 cube UNSAT（= 7R で重み ≤105 のトレイルは第 1 段重みが 8〜40 の範囲にしか存在し得ない。これは証明なしの kissat 判定）。
-優先帯 w0=6（14 本）は第 2 パスで全て UNSAT、w0=18（24 本）は 10 本 UNSAT・14 本未決着、w0=8/16 も一部未決着。
+After both passes, `w0 ≤ 7` and `w0 ≥ 41` are entirely UNSAT (so any weight-≤105
+7R trail would have first-round weight in 8..40 — a kissat verdict, not a DRAT
+proof). The undecided cubes concentrate in the `w0 = 10..30` bands. Priority band
+`w0=6` (14 cubes) went fully UNSAT in pass 2; `w0=18` (24) is 10 UNSAT / 14
+undecided.
 
-## 8R k=121 の結果
+## 8R k=121
 
-| 本数 | UNSAT | 未決着 | SAT | 未着手 | CPU 秒 |
+| Cubes | UNSAT | Undecided | SAT | Not started | CPU s |
 |---|---|---|---|---|---|
-| 749 / 2,211 | 398 | 351 | 0 | 1,462 | 71,986（20.0 h） |
+| 749 / 2,211 | 398 | 351 | 0 | 1,462 | 71,986 (20.0 h) |
 
-w0 帯（UNSAT/未決着）: 2:64/2, 3:64/1, 4:53/11, 5:52/11, 6:38/24, 7:38/23, 8:19/41, 9:19/40, 10:14/44, 11:13/44, 12:2/30（途中）, 16:11/41, 18:11/39。w0≥13（12,16,18 以外）は未着手。
+Per `w0` band (UNSAT/undecided): 2: 64/2, 3: 64/1, 4: 53/11, 5: 52/11, 6: 38/24,
+7: 38/23, 8: 19/41, 9: 19/40, 10: 14/44, 11: 13/44, 12: 2/30 (partial), 16: 11/41,
+18: 11/39. `w0 ≥ 13` (except 12, 16, 18) not started.
 
-## 読み方・注意
+## How to read this
 
-- 「未決着」= 予算内に SAT も UNSAT も出なかった cube。SAT が無いことは「≤105／≤121 のトレイルが無い」ことを**意味しない**。
-- 第 2 パスでも w0=10〜30 帯は 900 秒で決着しない cube が多く、7R で ≤105 を見つけるなら (a) この帯に対してより長い予算、(b) 構造を使った種（6R 82 トレイルの段別 [18,6,18,16,8,16] に 1 段足した形など）の固定探索、(c) CLAASP 素の k=105 を長時間、のいずれかが要る。
-- 6R で k=82 の SAT が無制約 141〜173 秒・cube 7 秒で出たのと対照的に、7R k=105 は無制約 2 時間でも出ない。Table 4 の 7R=106 が本当に最適である可能性も十分あるが、本探索ではどちらとも言えない。
-- 8R は予算が小さく、cube の 2/3 が未着手。結果は「軽く探して空振り」の域。
+- "Undecided" = neither SAT nor UNSAT within budget. The absence of a SAT does
+  **not** mean no trail of weight ≤ 105 / ≤ 121 exists.
+- Many `w0 = 10..30` cubes do not settle even at 900 s, so finding a ≤105 7R
+  trail would need (a) a longer budget on that band, (b) a structured seed (e.g.
+  extend the 6R weight-82 profile `[18,6,18,16,8,16]` by one round and fix it),
+  or (c) bare CLAASP k=105 run for much longer.
+- By contrast the 6R weight-82 SAT appeared in 141–173 s unconstrained / 7 s per
+  cube, whereas 7R k=105 did not appear even in 2 h unconstrained. Table-4's 7R =
+  106 may well be optimal, but this search decides neither way.
+- The 8R budget was small and 2/3 of the cubes were never attempted; this is only
+  a light probe.
 
-## 生成物
+## Artifacts
 
-- `cnf/hyb_7R_k105.*`, `cnf/hyb_8R_k121.*`, `cubes_7R_k105/`, `cubes_8R_k121/`, `bounds.json`（6R・7R の行を追加。6R 以前の CNF はバイト一致で不変。元は `bounds_6R_campaign.json`）
-- `review/p2a/7R_k105/results.tsv`, `review/p2a/7R_k105_pass2/results.tsv`, `review/p2a/8R_k121/results.tsv`（cube／status／秒）、各 `sched.log`、`review/p2a/pass2.log`
-- `review/p2a/hyb_7R_k105_free.time`, `review/p2a/claasp_7R_k105_free.json`（無制約 2 時間、未決着）
-- スクリプト: `review/sat_sched.py`（SAT 方向 cube スケジューラ、OOM ガード付き）、`review/p2a_pass2.sh`
-- 一時ファイルは削除済み。自分の起動したプロセスは全て終了（残るのは `~/speck-probe` の kissat 1 本のみ）。
+- `cnf/hyb_7R_k105.*`, `cnf/hyb_8R_k121.*`, `cubes_7R_k105/`, `cubes_8R_k121/`,
+  `bounds.json` (6R/7R rows added; the ≤6R CNFs are byte-identical and unchanged;
+  original was `bounds_6R_campaign.json`).
+- `review/p2a/7R_k105/results.tsv`, `review/p2a/7R_k105_pass2/results.tsv`,
+  `review/p2a/8R_k121/results.tsv` (cube / status / seconds), each `sched.log`,
+  `review/p2a/pass2.log`.
+- `review/p2a/hyb_7R_k105_free.time`, `review/p2a/claasp_7R_k105_free.json`
+  (the 2 h unconstrained runs, undecided).
+- Scripts: `review/sat_sched.py` (SAT-direction cube scheduler, memory-guarded),
+  `review/p2a_pass2.sh`.

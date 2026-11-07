@@ -10,17 +10,28 @@ compute host used for the campaign.
 - `kissat` 4.0.4 (tag `rel-4.0.4`): build from
   https://github.com/arminbiere/kissat ; binary at `build/kissat`.
 - `drat-trim`: build from https://github.com/marijnheule/drat-trim with
-  `-D_GNU_SOURCE`. **The DRAT driver scripts (`cube_drat_one_6R.sh`,
-  `drat_full_one.sh`) contain an absolute `DT=...` path to a drat-trim binary
-  from the original host; edit it to your build before running.** The runner
-  scripts also default `KISSAT=$HOME/kissat/build/kissat`.
+  `-D_GNU_SOURCE`. **Several scripts carry absolute paths from the original
+  compute host; edit them to your own layout before running:**
+  - `cube_drat_one_6R.sh` and `drat_full_one.sh`: the `DT=...` drat-trim binary
+    path, and in `drat_full_one.sh` the `A=/home/otoi/explore/aradi` /
+    `D=$A/review/drat_full` roots; both also default
+    `KISSAT=$HOME/kissat/build/kissat`;
+  - `cube_drat_one_6R.sh`: the flock-semaphore directory (`$SL/slot*`) used to
+    cap concurrent drat-trim runs;
+  - `hybrid_cnf.py`: the `sys.path.insert(..., "~/explore/aradi")` line;
+  - `claasp_run.py`: `BASE = ~/explore/aradi/claasp_src` (its `sagestub`,
+    `claasp` and `espresso-logic/bin` live under it);
+  - `bits_fixed.py` and `claasp_fixed_check.py`: the `S="/tmp/.../scratchpad"`
+    working directory.
+- Python packages: `python-sat` (`pysat`), required by CLAASP and by
+  `aradi_diff.py`; `numpy`, required by `verify_empirical.py`.
 - CLAASP at the pinned commit (next step).
 
 ## 1. CLAASP at the pinned commit
 
 ```
 git clone https://github.com/Crypto-TII/claasp.git
-cd claasp && git checkout f2239d639ae5c4a013947ce9121c6f4464584758   # == f2239d6, VERSION v3.2.0
+cd claasp && git checkout f2239d639ae5c4a013947ce9121c6f4464584758   # == f2239d6, VERSION v3.2.00
 ```
 
 Make CLAASP importable. The canonical path is a full SageMath + CLAASP install
@@ -33,7 +44,8 @@ classabbyamp/espresso-logic (built with `-std=gnu17`); the S-box CNF produced
 this way was checked by full 2^12 enumeration to realise exactly
 `{DDT != 0} x {hw = unary(4 - log2 DDT)}` (97 models), and the one-to-five-round
 optima match Table 4, so either route yields the same CNF. Point the `code/`
-scripts at your CLAASP (they import `claasp`).
+scripts at your CLAASP (they import `claasp`, and also `pysat` — install
+`python-sat`).
 
 ## 2. Hybrid CNF for six rounds, weight <= 81
 
@@ -100,7 +112,7 @@ side at the optimum is the small JSON trail. Logs are in `certs/matsui/`
 `s=0..3`). To re-make a 5R bound, e.g.:
 
 ```
-python aradi_diff.py --rounds 5 --k 49 --start <s> --dump   # -> CNF; solve with kissat --unsat + DRAT, check with drat-trim
+python aradi_diff.py --rounds 5 --k 49 --start <s> --dump <out.cnf>   # --dump needs an output path; solve with kissat --unsat + DRAT, check with drat-trim
 ```
 
 (`claasp_1..4R` bounds use CLAASP CNFs directly; see `bounds/claasp_repro_1_5.txt`.)
@@ -115,8 +127,13 @@ python claasp_run.py --rounds 6 --k 82 --trail trails/t6R_k82_trail.json   # exp
 python claasp_run.py --rounds 6 --k 81 --trail trails/t6R_k82_trail.json   # expect UNSAT
 python verify_trail.py trails/t6R_k82_trail.json                           # designers' formula -> 82
 python verify_empirical.py trails/t6R_k82_trail.json                       # Monte-Carlo -> ~82
-python claasp_certificate.py                                               # 0 violated clauses in the unconstrained CNF
+python claasp_certificate.py 6 82 trails/t6R_k82_trail.json                # argv = R K trail.json; 0 violated clauses in the unconstrained CNF
 ```
+
+The designers'-formula recomputation output for the Table-1 trail is bundled at
+`trails/t6R_k82_verify_trail.txt`; the CLAASP S-box and real bit-sliced fixing
+checks (k=82 SAT / k=81 UNSAT in each model) are reproduced by the commands
+above and by `code/bits_fixed.py`.
 
 ## 8. Bit-sliced cross-check (lemma-dependent — read this caveat)
 
